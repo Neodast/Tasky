@@ -1,10 +1,25 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  await app.listen(3000);
+
+  const logger = app.get<Logger>(WINSTON_MODULE_NEST_PROVIDER);
+  app.useLogger(logger);
+
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('server.port');
+
+  await app.listen(port);
+  logger.log({
+    context: 'Application bootstrap',
+    level: 'info',
+    message: `Server start in ${port} port!`,
+  });
 }
 bootstrap();
