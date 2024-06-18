@@ -35,7 +35,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  nickname: string;
+  username: string;
 
   @IsOptional()
   @IsPhoneNumber()

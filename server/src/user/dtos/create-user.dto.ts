@@ -26,7 +26,7 @@ export class CreateUserDto {
   surname?: string;
 
   @IsString()
-  nickname: string;
+  username: string;
 
   @IsOptional()
   @IsPhoneNumber()
