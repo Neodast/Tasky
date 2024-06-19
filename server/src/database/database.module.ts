@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 
+@Global()
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -24,14 +25,14 @@ import { Logger } from 'winston';
         };
 
         logger.log({
-          context: 'Database connection',
+          context: 'DatabaseModule',
           level: 'info',
           message: `Connecting to database ${dbConfig.database} at ${dbConfig.host}:${dbConfig.port}`,
         });
 
         return dbConfig;
       },
-      inject: [ConfigService, WINSTON_MODULE_PROVIDER],
+      inject: [ConfigService, WINSTON_MODULE_NEST_PROVIDER],
     }),
   ],
 })

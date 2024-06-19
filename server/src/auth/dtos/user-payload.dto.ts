@@ -1,11 +1,16 @@
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsStrongPassword } from 'class-validator';
 
 export class UserPayloadDto {
-  @IsString()
-  @IsEmail()
+  @IsEmail({
+    allow_utf8_local_part: false,
+  })
   email: string;
 
-  @MinLength(6)
-  @MaxLength(20)
+  @IsStrongPassword({
+    minNumbers: 1,
+    minLowercase: 1,
+    minUppercase: 1,
+    minLength: 6,
+  })
   password: string;
 }
