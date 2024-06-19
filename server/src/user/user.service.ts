@@ -88,6 +88,10 @@ export class UserService {
     return user;
   }
 
+  public async getByEmail(email: string): Promise<User> {
+    return this.repository.findOne({ where: { email: email } });
+  }
+
   public async update(updateData: UpdateUserDto): Promise<User> {
     if (
       !(await this.repository.exists({ where: { email: updateData.email } }))

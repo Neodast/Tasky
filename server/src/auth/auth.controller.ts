@@ -1,20 +1,25 @@
-import { Controller, Post, SerializeOptions, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, SerializeOptions } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { CurrentUser } from './decorators/current-user.decorator';
-import { User } from 'src/user/user.entity';
+import { RegisterUserDto } from './dtos/register-user.dto';
+import { PublicAccess } from './decorators/public-access.decorator';
+import { UserPayloadDto } from './dtos/user-payload.dto';
 
+@PublicAccess()
 @Controller('auth')
 @SerializeOptions({ strategy: 'excludeAll' })
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @UseGuards(LocalAuthGuard)
-  async login(@CurrentUser() user: User) {
+  async login(@Body() userPayload: UserPayloadDto) {
+    console.log(userPayload);
     return {
-      userId: user.id,
-      token: this.authService.getTokenForUser(user),
+      accessToken: (await this.authService.login(userPayload)).accessToken,
     };
+  }
+
+  @Post('registration')
+  async registration(@Body() userData: RegisterUserDto) {
+    return await this.authService.registration(userData);
   }
 }
