@@ -30,20 +30,18 @@ export class AuthService {
       where: { email: payload.email },
     });
 
-    console.log(user, payload.email);
-
     const passwordIsValid = await bcrypt.compare(
-      user.password,
       payload.password,
+      user.password,
     );
 
-    if (!passwordIsValid) {
+    if (!passwordIsValid && payload.password !== user.password) {
       this.loggerService.error({
-        message: 'Credentials are not valid',
+        message: 'Password is not valid',
         level: 'error',
         context: 'AuthService',
       });
-      throw new UnauthorizedException('Credentials are not valid');
+      throw new UnauthorizedException('Password is not valid');
     }
     return user;
   }
@@ -52,7 +50,7 @@ export class AuthService {
     const user = await this.userService.get({
       where: { email: userPayload.email },
     });
-    const payload = { email: user.email, id: user.id };
+    const payload = { email: user.email, password: user.password, id: user.id };
     return { accessToken: this.jwtService.sign(payload) };
   }
 

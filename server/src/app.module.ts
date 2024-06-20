@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt-auth.guard';
+import { JwtStrategy } from './auth/strategies/jwt.strategy';
 @Module({
   imports: [
     UserModule,
@@ -21,6 +22,7 @@ import { JwtGuard } from './auth/guards/jwt-auth.guard';
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
+    JwtStrategy,
   ],
 })
 export class AppModule {}

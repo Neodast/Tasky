@@ -13,7 +13,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUserDto } from './dtos/get-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-
+// TODO add normal get/find methods
 @Injectable()
 export class UserService {
   constructor(

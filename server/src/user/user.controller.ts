@@ -21,7 +21,6 @@ export class UserController {
 
   @Post('create')
   create(@Body() createUserDto: CreateUserDto) {
-    this.loggerService.log(createUserDto);
     return this.userService.create(createUserDto);
   }
 

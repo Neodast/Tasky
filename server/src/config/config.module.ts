@@ -8,6 +8,7 @@ import appConfig from './app.config';
     NestConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       load: [appConfig],
+      isGlobal: true,
     }),
   ],
   controllers: [],
