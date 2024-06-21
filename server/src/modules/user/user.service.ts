@@ -13,7 +13,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUserDto } from './dtos/get-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-
+// TODO add normal get/find methods
 @Injectable()
 export class UserService {
   constructor(
@@ -62,7 +62,7 @@ export class UserService {
     this.loggerService.log({
       message: 'Users successfully gotten from database',
       level: 'info',
-      context: 'UserService',
+      context: 'UserService.getAll',
     });
     return users;
   }
@@ -76,14 +76,14 @@ export class UserService {
       this.loggerService.error({
         message: 'User is not found',
         level: 'error',
-        context: 'UserService',
+        context: 'UserService.get',
       });
       throw new NotFoundException('User is not found');
     }
     this.loggerService.log({
       message: 'User successfully gotten from database',
       level: 'info',
-      context: 'UserService',
+      context: 'UserService.get',
     });
     return user;
   }
@@ -99,7 +99,7 @@ export class UserService {
       this.loggerService.error({
         message: 'User is not found',
         level: 'error',
-        context: 'UserService',
+        context: 'UserService.update',
       });
       throw new NotFoundException('User is not found');
     }
@@ -108,7 +108,7 @@ export class UserService {
     this.loggerService.log({
       message: 'User is successfully updated',
       level: 'info',
-      context: 'UserService',
+      context: 'UserService.update',
     });
     return updatedUser;
   }

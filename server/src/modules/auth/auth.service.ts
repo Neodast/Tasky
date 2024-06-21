@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/modules/user/user.service';
 import { UserPayloadDto } from './dtos/user-payload.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -30,20 +30,18 @@ export class AuthService {
       where: { email: payload.email },
     });
 
-    console.log(user, payload.email);
-
     const passwordIsValid = await bcrypt.compare(
-      user.password,
       payload.password,
+      user.password,
     );
 
-    if (!passwordIsValid) {
+    if (!passwordIsValid && payload.password !== user.password) {
       this.loggerService.error({
-        message: 'Credentials are not valid',
+        message: 'Password is not valid',
         level: 'error',
-        context: 'AuthService',
+        context: 'AuthService.verify',
       });
-      throw new UnauthorizedException('Credentials are not valid');
+      throw new UnauthorizedException('Password is not valid');
     }
     return user;
   }
@@ -52,7 +50,12 @@ export class AuthService {
     const user = await this.userService.get({
       where: { email: userPayload.email },
     });
-    const payload = { email: user.email, id: user.id };
+    const payload = { email: user.email, password: user.password, id: user.id };
+    this.loggerService.log({
+      message: 'User succesfully login',
+      level: 'info',
+      context: 'AuthService.login',
+    });
     return { accessToken: this.jwtService.sign(payload) };
   }
 
@@ -67,6 +70,11 @@ export class AuthService {
       password: hashedPassword,
     };
     const createdUser = await this.userService.create(userSecureData);
+    this.loggerService.log({
+      message: 'User succesfully register',
+      level: 'info',
+      context: 'AuthService.registration',
+    });
     return this.login(createdUser);
   }
 }
