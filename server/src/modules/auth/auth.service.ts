@@ -10,8 +10,10 @@ import { UserService } from 'src/modules/user/user.service';
 import { UserPayloadDto } from './dtos/user-payload.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { AccessToken } from 'src/utils/types/access-token.type';
-import { RegisterUserDto } from './dtos/register-user.dto';
+import { AccessToken } from 'src/common/types/access-token.type';
+import { RegistrationUserDto } from './dtos/register-user.dto';
+import { LoginUserDto } from './dtos/login-user.dto';
+import { VerifyUserDto } from './dtos/verify-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +27,7 @@ export class AuthService {
     return bcrypt.hash(password, 4);
   }
 
-  public async verifyUser(payload: UserPayloadDto) {
+  public async verifyUser(payload: UserPayloadDto): Promise<VerifyUserDto> {
     const user = await this.userService.get({
       where: { email: payload.email },
     });
@@ -46,11 +48,16 @@ export class AuthService {
     return user;
   }
 
-  async login(userPayload: UserPayloadDto): Promise<AccessToken> {
+  async login(loginData: LoginUserDto): Promise<AccessToken> {
     const user = await this.userService.get({
-      where: { email: userPayload.email },
+      where: { email: loginData.email },
     });
-    const payload = { email: user.email, password: user.password, id: user.id };
+    const payload = {
+      email: user.email,
+      password: user.password,
+      id: user.id,
+      role: user.role,
+    };
     this.loggerService.log({
       message: 'User succesfully login',
       level: 'info',
@@ -59,14 +66,18 @@ export class AuthService {
     return { accessToken: this.jwtService.sign(payload) };
   }
 
-  async registration(userData: RegisterUserDto): Promise<AccessToken> {
-    const existingUser = await this.userService.getByEmail(userData.email);
+  async registration(
+    registrationData: RegistrationUserDto,
+  ): Promise<AccessToken> {
+    const existingUser = await this.userService.getByEmail(
+      registrationData.email,
+    );
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
-    const hashedPassword = await this.hashPassword(userData.password);
-    const userSecureData: RegisterUserDto = {
-      ...userData,
+    const hashedPassword = await this.hashPassword(registrationData.password);
+    const userSecureData: RegistrationUserDto = {
+      ...registrationData,
       password: hashedPassword,
     };
     const createdUser = await this.userService.create(userSecureData);

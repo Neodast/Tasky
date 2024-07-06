@@ -25,7 +25,7 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Roles('admin')
+  @Roles('admin', 'guest')
   @Get()
   findAll(@Query() options: GetUsersDto) {
     return this.userService.getAll(options);

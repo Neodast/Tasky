@@ -6,7 +6,7 @@ import {
   IsStrongPassword,
 } from 'class-validator';
 
-export class RegisterUserDto {
+export class RegistrationUserDto {
   @IsEmail({
     allow_utf8_local_part: false,
   })

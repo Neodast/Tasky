@@ -20,7 +20,7 @@ export class CookieInterceptor implements NestInterceptor {
 
         this.cookieHelper.setCookie(res, 'accessToken', accessToken);
 
-        return { accessToken };
+        return accessToken;
       }),
     );
   }

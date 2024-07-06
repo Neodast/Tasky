@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserPayloadDto } from '../dtos/user-payload.dto';
 import { AuthService } from '../auth.service';
-import { User } from 'src/modules/user/user.entity';
+import { VerifyUserDto } from '../dtos/verify-user.dto';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -20,8 +20,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: UserPayloadDto): Promise<User> {
+  async validate(payload: UserPayloadDto): Promise<VerifyUserDto> {
     const user = await this.authService.verifyUser(payload);
-    return user;
+    return user; //TODO add serializetion here and in local strategy
   }
 }

@@ -7,7 +7,7 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { UserRole } from 'src/utils/enums/user-role.enum';
+import { UserRole } from 'src/common/enums/user-role.enum';
 
 export class UpdateUserDto {
   @IsUUID(4)

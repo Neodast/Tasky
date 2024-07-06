@@ -6,10 +6,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './dtos/register-user.dto';
+import { RegistrationUserDto } from './dtos/register-user.dto';
 import { PublicAccess } from './decorators/public-access.decorator';
-import { UserPayloadDto } from './dtos/user-payload.dto';
 import { CookieInterceptor } from './interceptors/cookie.interceptor';
+import { LoginUserDto } from './dtos/login-user.dto';
+
 @PublicAccess()
 @Controller('auth')
 @SerializeOptions({ strategy: 'excludeAll' })
@@ -18,12 +19,12 @@ export class AuthController {
 
   @UseInterceptors(CookieInterceptor)
   @Post('login')
-  async login(@Body() userPayload: UserPayloadDto) {
-    return (await this.authService.login(userPayload)).accessToken;
+  async login(@Body() loginData: LoginUserDto) {
+    return (await this.authService.login(loginData)).accessToken;
   }
 
   @Post('registration')
-  async registration(@Body() userData: RegisterUserDto) {
-    return await this.authService.registration(userData);
+  async registration(@Body() registrationData: RegistrationUserDto) {
+    return await this.authService.registration(registrationData);
   }
 }
