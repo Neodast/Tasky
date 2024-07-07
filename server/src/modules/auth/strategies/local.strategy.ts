@@ -2,8 +2,8 @@ import { AuthService } from '../auth.service';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { UserPayloadDto } from '../dtos/user-payload.dto';
-import { VerifyUserDto } from '../dtos/verify-user.dto';
+import { VerifyUserDto } from '../dtos/user-payload.dto';
+import { UserPayloadDto } from '../dtos/verify-user.dto';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
@@ -11,7 +11,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     super({ usernameField: 'email' });
   }
 
-  public async validate(payload: UserPayloadDto): Promise<VerifyUserDto> {
+  public async validate(payload: VerifyUserDto): Promise<UserPayloadDto> {
     const user = await this.authService.verifyUser(payload);
     return user;
   }

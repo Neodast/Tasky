@@ -7,13 +7,13 @@ import {
 } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { UserService } from 'src/modules/user/user.service';
-import { UserPayloadDto } from './dtos/user-payload.dto';
+import { VerifyUserDto } from './dtos/user-payload.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken } from 'src/common/types/access-token.type';
 import { RegistrationUserDto } from './dtos/register-user.dto';
+import { UserPayloadDto } from './dtos/verify-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
-import { VerifyUserDto } from './dtos/verify-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,17 +27,30 @@ export class AuthService {
     return bcrypt.hash(password, 4);
   }
 
-  public async verifyUser(payload: UserPayloadDto): Promise<VerifyUserDto> {
+  private async getAccessToken(email: string): Promise<AccessToken> {
     const user = await this.userService.get({
-      where: { email: payload.email },
+      where: { email: email },
+    });
+    const payload = {
+      email: user.email,
+      password: user.password,
+      id: user.id,
+      role: user.role,
+    };
+    return this.jwtService.sign(payload);
+  }
+
+  public async verifyUser(userData: VerifyUserDto): Promise<UserPayloadDto> {
+    const user = await this.userService.get({
+      where: { email: userData.email },
     });
 
     const passwordIsValid = await bcrypt.compare(
-      payload.password,
+      userData.password,
       user.password,
     );
 
-    if (!passwordIsValid && payload.password !== user.password) {
+    if (!passwordIsValid && userData.password !== user.password) {
       this.loggerService.error({
         message: 'Password is not valid',
         level: 'error',
@@ -48,22 +61,8 @@ export class AuthService {
     return user;
   }
 
-  async login(loginData: LoginUserDto): Promise<AccessToken> {
-    const user = await this.userService.get({
-      where: { email: loginData.email },
-    });
-    const payload = {
-      email: user.email,
-      password: user.password,
-      id: user.id,
-      role: user.role,
-    };
-    this.loggerService.log({
-      message: 'User succesfully login',
-      level: 'info',
-      context: 'AuthService.login',
-    });
-    return { accessToken: this.jwtService.sign(payload) };
+  public async login(loginData: LoginUserDto): Promise<AccessToken> {
+    return this.getAccessToken(loginData.email);
   }
 
   async registration(
@@ -81,11 +80,13 @@ export class AuthService {
       password: hashedPassword,
     };
     const createdUser = await this.userService.create(userSecureData);
-    this.loggerService.log({
-      message: 'User succesfully register',
-      level: 'info',
-      context: 'AuthService.registration',
-    });
-    return this.login(createdUser);
+    return this.getAccessToken(createdUser.email);
+  }
+
+  public async refresh(accessToken: AccessToken): Promise<string> {
+    const userPayload: UserPayloadDto =
+      await this.jwtService.decode(accessToken);
+    const user = await this.userService.getByEmail(userPayload.email);
+    return this.getAccessToken(user.email);
   }
 }

@@ -12,6 +12,8 @@ import { UserService } from './user.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { GetUsersDto } from './dtos/get-users.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('users')
 export class UserController {
@@ -27,6 +29,7 @@ export class UserController {
 
   @Roles('admin', 'guest')
   @Get()
+  @Serialize(UserDto)
   findAll(@Query() options: GetUsersDto) {
     return this.userService.getAll(options);
   }

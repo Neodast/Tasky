@@ -1,6 +1,6 @@
 import { UserRole } from 'src/common/enums/user-role.enum';
 
-export class VerifyUserDto {
+export class UserPayloadDto {
   id: string;
 
   email: string;

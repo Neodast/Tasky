@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieHelper } from '../helpers/cookie.helper';
 
-/** Set refreshToken to cookie and remove refreshToken from payload */
 @Injectable()
 export class CookieInterceptor implements NestInterceptor {
   constructor(private cookieHelper: CookieHelper) {}
@@ -16,7 +15,7 @@ export class CookieInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         const res = context.switchToHttp().getResponse();
-        const accessToken = data;
+        const { accessToken } = data;
 
         this.cookieHelper.setCookie(res, 'accessToken', accessToken);
 

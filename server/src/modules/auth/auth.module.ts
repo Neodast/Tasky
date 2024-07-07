@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtGuard } from './guards/jwt-auth.guard';
 import { CookieHelper } from './helpers/cookie.helper';
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
   imports: [
