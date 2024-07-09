@@ -2,11 +2,10 @@ import {
   ConflictException,
   Inject,
   Injectable,
-  LoggerService,
   UnauthorizedException,
 } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { UserService } from 'src/modules/user/user.service';
+import { UsersService } from 'src/modules/user/users.service';
 import { VerifyUserDto } from './dtos/user-payload.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -14,12 +13,13 @@ import { AccessToken } from 'src/common/types/access-token.type';
 import { RegistrationUserDto } from './dtos/register-user.dto';
 import { UserPayloadDto } from './dtos/verify-user.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { Logger } from 'winston';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(WINSTON_MODULE_NEST_PROVIDER) private loggerService: LoggerService,
-    private userService: UserService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private logger: Logger,
+    private userService: UsersService,
     private jwtService: JwtService,
   ) {}
 
@@ -28,7 +28,7 @@ export class AuthService {
   }
 
   private async getAccessToken(email: string): Promise<AccessToken> {
-    const user = await this.userService.get({
+    const user = await this.userService.getOneByCriteria({
       where: { email: email },
     });
     const payload = {
@@ -41,7 +41,7 @@ export class AuthService {
   }
 
   public async verifyUser(userData: VerifyUserDto): Promise<UserPayloadDto> {
-    const user = await this.userService.get({
+    const user = await this.userService.getOneByCriteria({
       where: { email: userData.email },
     });
 
@@ -51,7 +51,7 @@ export class AuthService {
     );
 
     if (!passwordIsValid && userData.password !== user.password) {
-      this.loggerService.error({
+      this.logger.log({
         message: 'Password is not valid',
         level: 'error',
         context: 'AuthService.verify',
@@ -68,7 +68,7 @@ export class AuthService {
   async registration(
     registrationData: RegistrationUserDto,
   ): Promise<AccessToken> {
-    const existingUser = await this.userService.getByEmail(
+    const existingUser = await this.userService.findOneByEmail(
       registrationData.email,
     );
     if (existingUser) {
@@ -83,10 +83,10 @@ export class AuthService {
     return this.getAccessToken(createdUser.email);
   }
 
-  public async refresh(accessToken: AccessToken): Promise<string> {
+  public async refresh(accessToken: AccessToken): Promise<AccessToken> {
     const userPayload: UserPayloadDto =
       await this.jwtService.decode(accessToken);
-    const user = await this.userService.getByEmail(userPayload.email);
+    const user = await this.userService.findOneByEmail(userPayload.email);
     return this.getAccessToken(user.email);
   }
 }

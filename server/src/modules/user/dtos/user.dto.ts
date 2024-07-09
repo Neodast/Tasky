@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRoles } from 'src/common/enums/user-role.enum';
 
 export class UserDto {
   @Expose()
@@ -30,5 +30,5 @@ export class UserDto {
   isVerified: boolean;
 
   @Expose()
-  role: UserRole;
+  role: UserRoles;
 }

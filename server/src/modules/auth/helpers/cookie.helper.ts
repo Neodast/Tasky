@@ -7,11 +7,11 @@ export class CookieHelper {
   constructor(private configService: ConfigService) {}
 
   public async setCookie(
-    @Res() responce: Response,
+    @Res() response: Response,
     cookieName: string,
     cookie: string,
   ) {
-    return responce.cookie(cookieName, cookie, {
+    return response.cookie(cookieName, cookie, {
       httpOnly: true,
       secure: this.configService.get<string>('node.env') === 'production',
       sameSite: 'strict',

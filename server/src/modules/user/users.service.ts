@@ -2,7 +2,6 @@ import {
   ConflictException,
   Inject,
   Injectable,
-  LoggerService,
   NotFoundException,
 } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
@@ -13,37 +12,69 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUserDto } from './dtos/get-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-// TODO add normal get/find methods
+import { Logger } from 'winston';
+
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
-    private readonly loggerService: LoggerService,
+    private readonly logger: Logger,
     @InjectRepository(User) private repository: Repository<User>,
   ) {}
 
   public async create(createData: CreateUserDto): Promise<User> {
     if (await this.repository.exists({ where: { email: createData.email } })) {
-      this.loggerService.error({
-        message: 'User alredy exists',
+      this.logger.log({
+        message: 'User already exists',
         level: 'error',
-        context: 'UserService',
+        context: 'UsersService.create',
       });
-      throw new ConflictException('User alredy exists');
+      throw new ConflictException('User already exists');
     }
 
     const createdUser = await this.repository.save(
       this.repository.create(createData),
     );
-    this.loggerService.log({
+    this.logger.log({
       message: 'User is successfully created',
       level: 'info',
-      context: 'UserService',
+      context: 'UsersService.create',
     });
     return createdUser;
   }
 
-  public async getAll(options: GetUsersDto): Promise<User[]> {
+  public async update(updateData: UpdateUserDto): Promise<User> {
+    if (
+      !(await this.repository.exists({ where: { email: updateData.email } }))
+    ) {
+      this.logger.log({
+        message: 'User is not found',
+        level: 'error',
+        context: 'UsersService.update',
+      });
+      throw new NotFoundException('User is not found');
+    }
+
+    const updatedUser = await this.repository.save(updateData);
+    this.logger.log({
+      message: 'User is successfully updated',
+      level: 'info',
+      context: 'UsersService.update',
+    });
+    return updatedUser;
+  }
+
+  public async remove(id: string): Promise<void> {
+    const user = await this.getOneByCriteria({ where: { id: id } });
+    await this.repository.remove(user);
+    this.logger.log({
+      message: 'User successfully deleted',
+      level: 'info',
+      context: 'UsersService.remove',
+    });
+  }
+
+  public async getAllByOptions(options: GetUsersDto): Promise<User[]> {
     const sortableFields = ['creationDate', 'username', 'name', 'surname'];
     if (!options.sortBy || !sortableFields.includes(options.sortBy)) {
       options.sortBy = 'creationDate';
@@ -59,57 +90,49 @@ export class UserService {
       skip: (options.page - 1) * options.take,
       relations: [],
     });
-    this.loggerService.log({
+    this.logger.log({
       message: 'Users successfully gotten from database',
       level: 'info',
-      context: 'UserService.getAll',
+      context: 'UsersService.getAll',
     });
     return users;
   }
 
-  public async get(options: GetUserDto): Promise<User> {
+  public async getOneByCriteria(options: GetUserDto): Promise<User> {
     const user = await this.repository.findOne({
       where: options.where,
       relations: [],
     });
     if (!user) {
-      this.loggerService.error({
+      this.logger.log({
         message: 'User is not found',
         level: 'error',
-        context: 'UserService.get',
+        context: 'UsersService.get',
       });
       throw new NotFoundException('User is not found');
     }
-    this.loggerService.log({
+    this.logger.log({
       message: 'User successfully gotten from database',
       level: 'info',
-      context: 'UserService.get',
+      context: 'UsersService.getByCriteria',
     });
     return user;
   }
 
-  public async getByEmail(email: string): Promise<User> {
-    return this.repository.findOne({ where: { email: email } });
+  public async findOneByCriteria(options: GetUserDto): Promise<User | null> {
+    const user = await this.repository.findOne({
+      where: options.where,
+      relations: [],
+    });
+    this.logger.log({
+      message: 'User successfully gotten from database',
+      level: 'info',
+      context: 'UsersService.findByCriteria',
+    });
+    return user;
   }
 
-  public async update(updateData: UpdateUserDto): Promise<User> {
-    if (
-      !(await this.repository.exists({ where: { email: updateData.email } }))
-    ) {
-      this.loggerService.error({
-        message: 'User is not found',
-        level: 'error',
-        context: 'UserService.update',
-      });
-      throw new NotFoundException('User is not found');
-    }
-
-    const updatedUser = await this.repository.save(updateData);
-    this.loggerService.log({
-      message: 'User is successfully updated',
-      level: 'info',
-      context: 'UserService.update',
-    });
-    return updatedUser;
+  public async findOneByEmail(email: string): Promise<User | null> {
+    return this.repository.findOne({ where: { email: email } });
   }
 }

@@ -1,4 +1,4 @@
-import { UserRole } from 'src/common/enums/user-role.enum';
+import { UserRoles } from 'src/common/enums/user-role.enum';
 import {
   Column,
   CreateDateColumn,
@@ -43,6 +43,6 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.GUEST })
-  role: UserRole;
+  @Column({ type: 'enum', enum: UserRoles, default: UserRoles.USER })
+  role: UserRoles;
 }

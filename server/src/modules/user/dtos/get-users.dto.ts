@@ -1,7 +1,7 @@
-import { Type } from 'class-transformer';
-import { IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsObject, IsOptional, IsString } from 'class-validator';
+import { PaginationParamsDto } from 'src/common/dtos/pagination-params.dto';
 
-export class GetUsersDto {
+export class GetUsersDto extends PaginationParamsDto {
   @IsOptional()
   @IsObject()
   where?: Record<string, string>;
@@ -9,12 +9,4 @@ export class GetUsersDto {
   @IsOptional()
   @IsString()
   sortBy?: string;
-
-  @Type(() => Number)
-  @IsNumber({ allowNaN: false })
-  take: number;
-
-  @Type(() => Number)
-  @IsNumber({ allowNaN: false })
-  page: number;
 }
