@@ -1,17 +1,16 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from 'src/modules/user/user.module';
+import { UsersModule } from 'src/modules/user/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtGuard } from './guards/jwt-auth.guard';
 import { CookieHelper } from './helpers/cookie.helper';
 
 @Module({
   imports: [
-    UserModule,
+    UsersModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -24,7 +23,7 @@ import { CookieHelper } from './helpers/cookie.helper';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, JwtGuard, CookieHelper],
+  providers: [AuthService, LocalStrategy, JwtGuard, CookieHelper],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

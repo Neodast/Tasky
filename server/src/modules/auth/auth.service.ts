@@ -2,22 +2,24 @@ import {
   ConflictException,
   Inject,
   Injectable,
-  LoggerService,
   UnauthorizedException,
 } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { UserService } from 'src/modules/user/user.service';
-import { UserPayloadDto } from './dtos/user-payload.dto';
+import { UsersService } from 'src/modules/user/users.service';
+import { VerifyUserDto } from './dtos/user-payload.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { AccessToken } from 'src/utils/types/access-token.type';
-import { RegisterUserDto } from './dtos/register-user.dto';
+import { AccessToken } from 'src/common/types/access-token.type';
+import { RegistrationUserDto } from './dtos/register-user.dto';
+import { UserPayloadDto } from './dtos/verify-user.dto';
+import { LoginUserDto } from './dtos/login-user.dto';
+import { Logger } from 'winston';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(WINSTON_MODULE_NEST_PROVIDER) private loggerService: LoggerService,
-    private userService: UserService,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER) private logger: Logger,
+    private userService: UsersService,
     private jwtService: JwtService,
   ) {}
 
@@ -25,18 +27,31 @@ export class AuthService {
     return bcrypt.hash(password, 4);
   }
 
-  public async verifyUser(payload: UserPayloadDto) {
-    const user = await this.userService.get({
-      where: { email: payload.email },
+  private async getAccessToken(email: string): Promise<AccessToken> {
+    const user = await this.userService.getOneByCriteria({
+      where: { email: email },
+    });
+    const payload = {
+      email: user.email,
+      password: user.password,
+      id: user.id,
+      role: user.role,
+    };
+    return this.jwtService.sign(payload);
+  }
+
+  public async verifyUser(userData: VerifyUserDto): Promise<UserPayloadDto> {
+    const user = await this.userService.getOneByCriteria({
+      where: { email: userData.email },
     });
 
     const passwordIsValid = await bcrypt.compare(
-      payload.password,
+      userData.password,
       user.password,
     );
 
-    if (!passwordIsValid && payload.password !== user.password) {
-      this.loggerService.error({
+    if (!passwordIsValid && userData.password !== user.password) {
+      this.logger.log({
         message: 'Password is not valid',
         level: 'error',
         context: 'AuthService.verify',
@@ -46,35 +61,32 @@ export class AuthService {
     return user;
   }
 
-  async login(userPayload: UserPayloadDto): Promise<AccessToken> {
-    const user = await this.userService.get({
-      where: { email: userPayload.email },
-    });
-    const payload = { email: user.email, password: user.password, id: user.id };
-    this.loggerService.log({
-      message: 'User succesfully login',
-      level: 'info',
-      context: 'AuthService.login',
-    });
-    return { accessToken: this.jwtService.sign(payload) };
+  public async login(loginData: LoginUserDto): Promise<AccessToken> {
+    return this.getAccessToken(loginData.email);
   }
 
-  async registration(userData: RegisterUserDto): Promise<AccessToken> {
-    const existingUser = await this.userService.getByEmail(userData.email);
+  async registration(
+    registrationData: RegistrationUserDto,
+  ): Promise<AccessToken> {
+    const existingUser = await this.userService.findOneByEmail(
+      registrationData.email,
+    );
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
-    const hashedPassword = await this.hashPassword(userData.password);
-    const userSecureData: RegisterUserDto = {
-      ...userData,
+    const hashedPassword = await this.hashPassword(registrationData.password);
+    const userSecureData: RegistrationUserDto = {
+      ...registrationData,
       password: hashedPassword,
     };
     const createdUser = await this.userService.create(userSecureData);
-    this.loggerService.log({
-      message: 'User succesfully register',
-      level: 'info',
-      context: 'AuthService.registration',
-    });
-    return this.login(createdUser);
+    return this.getAccessToken(createdUser.email);
+  }
+
+  public async refresh(accessToken: AccessToken): Promise<AccessToken> {
+    const userPayload: UserPayloadDto =
+      await this.jwtService.decode(accessToken);
+    const user = await this.userService.findOneByEmail(userPayload.email);
+    return this.getAccessToken(user.email);
   }
 }

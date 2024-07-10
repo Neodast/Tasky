@@ -4,7 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { Logger } from 'winston';
 import { ConfigService } from '@nestjs/config';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -17,7 +16,6 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
 
   const logger = app.get<Logger>(WINSTON_MODULE_NEST_PROVIDER);
   app.useLogger(logger);
@@ -27,7 +25,7 @@ async function bootstrap() {
   const port = configService.get<number>('server.port');
   await app.listen(port);
   logger.log({
-    context: 'ApplicationBootstrap',
+    context: 'Application.bootstrap',
     level: 'info',
     message: `Server start in ${port} port!`,
   });
