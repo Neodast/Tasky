@@ -3,8 +3,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Token } from '../auth/token.entity';
 
 @Entity({
   name: 'Users',
@@ -45,4 +47,7 @@ export class User {
 
   @Column({ type: 'enum', enum: UserRoles, default: UserRoles.USER })
   role: UserRoles;
+
+  @OneToOne(() => Token, (token) => token.user)
+  token: Token;
 }

@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { UsersService } from 'src/modules/user/users.service';
+import { UsersService } from 'src/features/user/users.service';
 import { VerifyUserDto } from './dtos/user-payload.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';

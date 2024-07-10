@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ListsModule } from './list/lists.module';
+import { CardsModule } from '../card/cards.module';
 
 @Module({
-  imports: [ListsModule],
+  imports: [CardsModule],
   controllers: [],
   providers: [],
   exports: [],
 })
-export class BoardsModule {}
+export class ListsModule {}

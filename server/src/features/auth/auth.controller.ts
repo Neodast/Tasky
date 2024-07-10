@@ -4,7 +4,6 @@ import {
   Get,
   Inject,
   Post,
-  SerializeOptions,
   UseInterceptors,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -19,7 +18,6 @@ import { Logger } from 'winston';
 
 @PublicAccess()
 @Controller('auth')
-@SerializeOptions({ strategy: 'excludeAll' })
 export class AuthController {
   constructor(
     private authService: AuthService,

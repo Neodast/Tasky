@@ -21,7 +21,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsHash('SHA256', {
-    message: 'Password incorectly hashed',
+    message: 'Password incorrectly hashed',
   })
   password: string;
 

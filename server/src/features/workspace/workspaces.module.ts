@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { BoardsModule } from './board/boards.module';
-import { MembersModule } from './member/members.module';
+import { BoardsModule } from '../board/boards.module';
+import { MembersModule } from '../member/members.module';
 
 @Module({
   imports: [MembersModule, BoardsModule],
