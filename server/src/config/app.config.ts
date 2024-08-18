@@ -13,7 +13,13 @@ export default () => ({
     port: Number(process.env.SERVER_PORT) || 3000,
   },
   jwt: {
-    secret: process.env.JWT_SECRET,
-    expires: process.env.JWT_EXPIRES,
+    access: {
+      secret: process.env.JWT_ACCESS_SECRET,
+      expires: process.env.JWT_ACCESS_EXPIRES,
+    },
+    refresh: {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expires: process.env.JWT_REFRESH_EXPIRES,
+    },
   },
 });

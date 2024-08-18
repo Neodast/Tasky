@@ -13,7 +13,7 @@ export class CreateUserDto {
   email: string;
 
   @IsHash('SHA256', {
-    message: 'Password incorectly hashed',
+    message: 'Password incorrectly hashed',
   })
   password: string;
 

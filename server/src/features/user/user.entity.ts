@@ -6,7 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Token } from '../auth/token.entity';
+import { Token } from '../auth/token/token.entity';
 
 @Entity({
   name: 'Users',

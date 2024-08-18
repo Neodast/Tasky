@@ -1,3 +1,4 @@
+import { User } from 'src/features/user/user.entity';
 import {
   Column,
   Entity,
@@ -5,7 +6,6 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity';
 
 @Entity({ name: 'Tokens' })
 export class Token {
