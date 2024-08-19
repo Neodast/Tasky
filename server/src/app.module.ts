@@ -3,7 +3,7 @@ import { AuthModule } from './features/auth/auth.module';
 import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { LoggerModule } from './logger/logger.module';
-import { UsersModule } from './features/user/users.module';
+import { UsersModule } from './features/users/users.module';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { JwtService } from '@nestjs/jwt';

@@ -1,11 +1,8 @@
-import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsJWT, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UpdateTokenDto {
-  @IsOptional()
-  @IsUUID(4)
-  id?: string;
-
   @IsString()
+  @IsJWT()
   refreshToken: string;
 
   @IsOptional()

@@ -17,13 +17,13 @@ export class UpdateUserDto {
   @IsEmail({
     allow_utf8_local_part: false,
   })
-  email: string;
+  email?: string;
 
   @IsOptional()
   @IsHash('SHA256', {
     message: 'Password incorrectly hashed',
   })
-  password: string;
+  password?: string;
 
   @IsOptional()
   @IsString()
@@ -35,7 +35,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  username: string;
+  username?: string;
 
   @IsOptional()
   @IsPhoneNumber()
@@ -46,9 +46,9 @@ export class UpdateUserDto {
   imageLink?: string;
 
   @IsOptional()
-  isVerify: boolean;
+  isVerify?: boolean;
 
   @IsOptional()
   @IsEnum(UserRoles)
-  role: UserRoles;
+  role?: UserRoles;
 }

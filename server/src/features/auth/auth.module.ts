@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from 'src/features/user/users.module';
+import { UsersModule } from 'src/features/users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { CookieHelper } from './helpers/cookie.helper';
 import { LocalStrategy } from './strategies/local.strategy';
-import { TokenModule } from './token/token.module';
-import { Token } from './token/token.entity';
+import { TokenModule } from './tokens/token.module';
+import { Token } from './tokens/token.entity';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { AuthMapper } from './mappers/auth.mapper';
 import { JwtAccessStrategy } from './strategies/jwt-access.strategy';

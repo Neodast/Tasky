@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { UsersService } from 'src/features/user/users.service';
+import { UsersService } from 'src/features/users/users.service';
 import { AuthLocalPayloadDto } from './dtos/auth-local-payload.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -15,7 +15,7 @@ import { RegistrationUserDto } from './dtos/register-user.dto';
 import { UserPayloadDto } from './dtos/user-payload.dto';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { Logger } from 'winston';
-import { TokenService } from './token/token.service';
+import { TokensService } from './tokens/tokens.service';
 import { RefreshToken } from './types/refresh-token.type';
 import { AuthMapper } from './mappers/auth.mapper';
 
@@ -25,7 +25,7 @@ export class AuthService {
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private logger: Logger,
     private usersService: UsersService,
     private jwtService: JwtService,
-    private tokenService: TokenService,
+    private tokensService: TokensService,
     private authMapper: AuthMapper,
   ) {}
 
@@ -36,7 +36,7 @@ export class AuthService {
   public async verifyUser(
     userData: AuthLocalPayloadDto,
   ): Promise<UserPayloadDto> {
-    const user = await this.usersService.getOneByCriteria({
+    const user = await this.usersService.getOneByCriteriaOrFail({
       where: { email: userData.email },
     });
 
@@ -59,30 +59,30 @@ export class AuthService {
   public async login(
     loginData: LoginUserDto,
   ): Promise<AccessToken & RefreshToken> {
-    const user = await this.usersService.getOneByCriteria({
+    const user = await this.usersService.getOneByCriteriaOrFail({
       where: { email: loginData.email },
     });
-    const tokenEntity = await this.tokenService.findRefreshByUserId(user.id);
-    const tokens = await this.tokenService.generateTokens(
+    const tokenEntity = await this.tokensService.getRefreshByUserId(user.id);
+    const tokens = await this.tokensService.generateTokens(
       this.authMapper.mapUserToUserPayloadDto(user),
     );
     if (tokenEntity) {
-      await this.tokenService.updateRefreshToken({
+      await this.tokensService.updateRefreshToken({
         userId: user.id,
         refreshToken: tokens.refreshToken,
       });
       return tokens;
     }
-    await this.tokenService.saveRefreshToken(tokens.refreshToken, user.id);
+    await this.tokensService.saveRefreshToken(tokens.refreshToken, user.id);
     return tokens;
   }
 
   async registration(
     registrationData: RegistrationUserDto,
   ): Promise<AccessToken & RefreshToken> {
-    const existingUser = await this.usersService.findOneByEmail(
-      registrationData.email,
-    );
+    const existingUser = await this.usersService.getOneByCriteria({
+      where: { email: registrationData.email },
+    });
     if (existingUser) {
       throw new ConflictException('Email already exists');
     }
@@ -92,20 +92,20 @@ export class AuthService {
       password: hashedPassword,
     };
     const createdUser = await this.usersService.create(userSecureData);
-    const tokens = await this.tokenService.generateTokens(createdUser);
-    this.tokenService.saveRefreshToken(tokens.refreshToken, createdUser.id);
+    const tokens = await this.tokensService.generateTokens(createdUser);
+    this.tokensService.saveRefreshToken(tokens.refreshToken, createdUser.id);
     return tokens;
   }
 
   public async refresh(userId: string): Promise<AccessToken> {
-    const dbToken = await this.tokenService.findRefreshByUserId(userId);
+    const dbToken = await this.tokensService.getRefreshByUserId(userId);
     if (!dbToken) {
       throw new NotFoundException('Refresh token is not found');
     }
-    const user = await this.usersService.findOneByCriteria({
+    const user = await this.usersService.getOneByCriteria({
       where: { id: userId },
     });
-    const tokens = await this.tokenService.generateTokens(user);
+    const tokens = await this.tokensService.generateTokens(user);
     return { accessToken: tokens.accessToken };
   }
 }

@@ -37,7 +37,7 @@ export class AuthController {
   ): Promise<AccessToken & RefreshToken> {
     const tokens = await this.authService.login(loginData);
     this.logger.log({
-      message: 'User successfully login',
+      message: `User with email ${loginData.email} successfully login`,
       level: 'info',
       context: 'AuthController.login',
     });
@@ -46,12 +46,12 @@ export class AuthController {
 
   @PublicAccess()
   @Post('registration')
-  async registration(
+  public async registration(
     @Body() registrationData: RegistrationUserDto,
   ): Promise<AccessToken> {
     const accessToken = await this.authService.registration(registrationData);
     this.logger.log({
-      message: 'User successfully register',
+      message: `User ${registrationData.username} successfully register`,
       level: 'info',
       context: 'AuthController.registration',
     });
