@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Inject,
   Post,
   UseGuards,
@@ -20,18 +21,27 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { UserPayloadDto } from './dtos/user-payload.dto';
+import { JwtAccessClearCookieInterceptor } from './interceptors/jwt-access-clear-cookie.interceptor';
+import { JwtAccessAuthGuard } from './guards/jwt-access-auth.guard';
+import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')
+@ApiTags('Auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private logger: Logger,
   ) {}
 
+  @Post('login')
+  @ApiBody({ type: LoginUserDto })
+  @ApiResponse({
+    example: `accessToken : {access},refreshToken : {refresh}`,
+    status: HttpStatus.OK,
+  })
   @PublicAccess()
   @UseInterceptors(JwtAccessSetCookieInterceptor)
   @UseGuards(LocalAuthGuard)
-  @Post('login')
   public async login(
     @Body() loginData: LoginUserDto,
   ): Promise<AccessToken & RefreshToken> {
@@ -44,8 +54,25 @@ export class AuthController {
     return tokens;
   }
 
-  @PublicAccess()
+  @Get('logout')
+  @UseInterceptors(JwtAccessClearCookieInterceptor)
+  @UseGuards(JwtAccessAuthGuard)
+  public async logout(@CurrentUser() user: UserPayloadDto): Promise<void> {
+    this.authService.logout(user.id);
+    this.logger.log({
+      message: `User ${user.username} successfully logout`,
+      level: 'info',
+      context: 'AuthController.logout',
+    });
+  }
+
   @Post('registration')
+  @ApiBody({ type: UserPayloadDto })
+  @ApiResponse({
+    example: 'accessToken: {access}',
+    status: HttpStatus.CREATED,
+  })
+  @PublicAccess()
   public async registration(
     @Body() registrationData: RegistrationUserDto,
   ): Promise<AccessToken> {
@@ -58,9 +85,14 @@ export class AuthController {
     return accessToken;
   }
 
+  @Get('refresh')
+  @ApiBearerAuth('refreshToken')
+  @ApiResponse({
+    example: 'accessToken: {access}',
+    status: HttpStatus.OK,
+  })
   @UseInterceptors(JwtAccessSetCookieInterceptor)
   @UseGuards(JwtRefreshAuthGuard)
-  @Get('refresh')
   public async refresh(
     @CurrentUser() user: UserPayloadDto,
   ): Promise<AccessToken> {

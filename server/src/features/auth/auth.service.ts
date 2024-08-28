@@ -18,6 +18,7 @@ import { Logger } from 'winston';
 import { TokensService } from './tokens/tokens.service';
 import { RefreshToken } from './types/refresh-token.type';
 import { AuthMapper } from './mappers/auth.mapper';
+import { CookieHelper } from './helpers/cookie.helper';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
     private jwtService: JwtService,
     private tokensService: TokensService,
     private authMapper: AuthMapper,
+    private cookieHelper: CookieHelper,
   ) {}
 
   private async hashPassword(password: string): Promise<string> {
@@ -77,13 +79,31 @@ export class AuthService {
     return tokens;
   }
 
+  public async logout(userId: string): Promise<void> {
+    const token = await this.tokensService.getRefreshByUserId(userId);
+    if (!token) {
+      this.logger.log({
+        message: `Refresh token is not found`,
+        level: 'error',
+        context: 'AuthService.logout',
+      });
+      throw new NotFoundException('Refresh token is not found');
+    }
+    this.tokensService.deleteRefreshToken(token.refreshToken);
+  }
+
   async registration(
     registrationData: RegistrationUserDto,
   ): Promise<AccessToken & RefreshToken> {
-    const existingUser = await this.usersService.getOneByCriteria({
+    const user = await this.usersService.getOneByCriteria({
       where: { email: registrationData.email },
     });
-    if (existingUser) {
+    if (user) {
+      this.logger.log({
+        message: `Email ${user.email} already exists`,
+        level: 'error',
+        context: 'AuthService.registration',
+      });
       throw new ConflictException('Email already exists');
     }
     const hashedPassword = await this.hashPassword(registrationData.password);

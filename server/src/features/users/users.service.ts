@@ -14,6 +14,7 @@ import { GetUserDto } from './dtos/get-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { Logger } from 'winston';
 import { DEFAULT_USERS_PAGE_SIZE } from 'src/common/constants/pagination.constant';
+import { filterFields } from './constants/get-users-filters.constant';
 
 @Injectable()
 export class UsersService {
@@ -75,20 +76,25 @@ export class UsersService {
     });
   }
 
-  public async getAllByOptions(options: GetUsersDto): Promise<User[]> {
+  public async getAllByOptions(params: GetUsersDto): Promise<User[]> {
     const sortableFields = ['creationDate', 'username', 'name', 'surname'];
-    if (!options.sortBy || !sortableFields.includes(options.sortBy)) {
-      options.sortBy = 'creationDate';
+    if (!params.sortBy || !sortableFields.includes(params.sortBy)) {
+      params.sortBy = 'creationDate';
     }
 
     const orderOption: Record<string, string> = {};
-    orderOption[options.sortBy] = 'ASC';
+    orderOption[params.sortBy] = 'ASC';
+
+    const filters = filterFields.reduce((acc, key) => {
+      acc[key] = params[key];
+      return acc;
+    }, {});
 
     const users = this.repository.find({
       order: orderOption,
-      where: options.where,
-      take: options.limit ?? DEFAULT_USERS_PAGE_SIZE,
-      skip: options.skip,
+      take: params.limit ?? DEFAULT_USERS_PAGE_SIZE,
+      skip: params.skip,
+      where: filters,
       relations: [],
     });
     this.logger.log({

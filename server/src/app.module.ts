@@ -5,8 +5,8 @@ import { DatabaseModule } from './database/database.module';
 import { LoggerModule } from './logger/logger.module';
 import { UsersModule } from './features/users/users.module';
 import { APP_FILTER } from '@nestjs/core';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { JwtService } from '@nestjs/jwt';
+import { AllExceptionsFilter } from './common/filters/exception.filter';
 @Module({
   imports: [
     UsersModule,
@@ -18,7 +18,7 @@ import { JwtService } from '@nestjs/jwt';
   providers: [
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: AllExceptionsFilter,
     },
     JwtService,
   ],
