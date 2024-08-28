@@ -1,0 +1,1 @@
+export const DEFAULT_USERS_PAGE_SIZE = 10;
