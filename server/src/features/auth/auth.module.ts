@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 import { CookieHelper } from './helpers/cookie.helper';
 import { LocalStrategy } from './strategies/local.strategy';
 import { TokenModule } from './tokens/token.module';
-import { Token } from './tokens/token.entity';
+import { TokenEntity } from './tokens/token.entity';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { AuthMapper } from './mappers/auth.mapper';
 import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
@@ -15,7 +15,7 @@ import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
 @Module({
   imports: [
     TokenModule,
-    TypeOrmModule.forFeature([Token]),
+    TypeOrmModule.forFeature([TokenEntity]),
     UsersModule,
     JwtModule.register({}),
   ],

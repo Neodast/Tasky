@@ -7,7 +7,7 @@ import {
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { GetUsersDto } from './dtos/get-users.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
+import { UserEntity } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUserDto } from './dtos/get-user.dto';
@@ -21,10 +21,10 @@ export class UsersService {
   constructor(
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private logger: Logger,
-    @InjectRepository(User) private repository: Repository<User>,
+    @InjectRepository(UserEntity) private repository: Repository<UserEntity>,
   ) {}
 
-  public async create(createData: CreateUserDto): Promise<User> {
+  public async create(createData: CreateUserDto): Promise<UserEntity> {
     if (await this.repository.exists({ where: { email: createData.email } })) {
       this.logger.log({
         message: `User ${createData.username} already created`,
@@ -45,7 +45,7 @@ export class UsersService {
     return createdUser;
   }
 
-  public async update(updateData: UpdateUserDto): Promise<User> {
+  public async update(updateData: UpdateUserDto): Promise<UserEntity> {
     if (
       !(await this.repository.exists({ where: { email: updateData.email } }))
     ) {
@@ -76,7 +76,7 @@ export class UsersService {
     });
   }
 
-  public async getAllByOptions(params: GetUsersDto): Promise<User[]> {
+  public async getAllByOptions(params: GetUsersDto): Promise<UserEntity[]> {
     const sortableFields = ['creationDate', 'username', 'name', 'surname'];
     if (!params.sortBy || !sortableFields.includes(params.sortBy)) {
       params.sortBy = 'creationDate';
@@ -105,7 +105,9 @@ export class UsersService {
     return users;
   }
 
-  public async getOneByCriteriaOrFail(options: GetUserDto): Promise<User> {
+  public async getOneByCriteriaOrFail(
+    options: GetUserDto,
+  ): Promise<UserEntity> {
     const user = await this.repository.findOne({
       where: options.where,
       relations: [],
@@ -126,7 +128,9 @@ export class UsersService {
     return user;
   }
 
-  public async getOneByCriteria(options: GetUserDto): Promise<User | null> {
+  public async getOneByCriteria(
+    options: GetUserDto,
+  ): Promise<UserEntity | null> {
     const user = await this.repository.findOne({
       where: options.where,
       relations: [],
@@ -139,7 +143,7 @@ export class UsersService {
     return user;
   }
 
-  public async getOneByEmailOrFail(email: string): Promise<User> {
+  public async getOneByEmailOrFail(email: string): Promise<UserEntity> {
     const user = await this.repository.findOne({ where: { email: email } });
     if (!user) {
       this.logger.error({

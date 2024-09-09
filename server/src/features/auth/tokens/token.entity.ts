@@ -1,4 +1,4 @@
-import { User } from 'src/features/users/user.entity';
+import { UserEntity } from 'src/features/users/user.entity';
 import {
   Column,
   Entity,
@@ -8,14 +8,14 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'Tokens' })
-export class Token {
+export class TokenEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ nullable: false })
   refreshToken: string;
 
-  @OneToOne(() => User, (user) => user.token, { nullable: false })
+  @OneToOne(() => UserEntity, (user) => user.token, { nullable: false })
   @JoinColumn()
-  user: User;
+  user: UserEntity;
 }

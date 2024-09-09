@@ -1,17 +1,20 @@
-import { UserRoles } from 'src/common/enums/user-role.enum';
+import { UserRoles } from 'src/common/enums/user-roles.enum';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Token } from '../auth/tokens/token.entity';
+import { TokenEntity } from '../auth/tokens/token.entity';
+import { WorkspaceEntity } from '../workspaces/workspace.entity';
+import { MemberEntity } from '../workspaces/members/member.entity';
 
 @Entity({
   name: 'Users',
 })
-export class User {
+export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -45,9 +48,15 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
-  @Column({ type: 'enum', enum: UserRoles, default: UserRoles.USER })
+  @Column({ type: 'enum', enum: UserRoles, default: UserRoles.User })
   role: UserRoles;
 
-  @OneToOne(() => Token, (token) => token.user)
-  token: Token;
+  @OneToOne(() => TokenEntity, (token) => token.user)
+  token: TokenEntity;
+
+  @OneToMany(() => WorkspaceEntity, (workspace) => workspace.owner)
+  workspaces: WorkspaceEntity[];
+
+  @OneToMany(() => MemberEntity, (member) => member.user)
+  memberships: MemberEntity[];
 }

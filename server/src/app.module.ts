@@ -7,6 +7,7 @@ import { UsersModule } from './features/users/users.module';
 import { APP_FILTER } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { AllExceptionsFilter } from './common/filters/exception.filter';
+import { WorkspacesModule } from './features/workspaces/workspaces.module';
 @Module({
   imports: [
     UsersModule,
@@ -14,6 +15,7 @@ import { AllExceptionsFilter } from './common/filters/exception.filter';
     LoggerModule,
     DatabaseModule,
     AuthModule,
+    WorkspacesModule,
   ],
   providers: [
     {
