@@ -19,6 +19,7 @@ import { TokensService } from './tokens/tokens.service';
 import { RefreshToken } from './types/refresh-token.type';
 import { AuthMapper } from './mappers/auth.mapper';
 import { CookieHelper } from './helpers/cookie.helper';
+import { FirebaseStorageService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,7 @@ export class AuthService {
     private tokensService: TokensService,
     private authMapper: AuthMapper,
     private cookieHelper: CookieHelper,
+    private firebaseStorageService: FirebaseStorageService,
   ) {}
 
   private async hashPassword(password: string): Promise<string> {
@@ -94,6 +96,7 @@ export class AuthService {
 
   async registration(
     registrationData: RegistrationUserDto,
+    icon?: Express.Multer.File,
   ): Promise<AccessToken & RefreshToken> {
     const user = await this.usersService.getOneByCriteria({
       where: { email: registrationData.email },
@@ -106,7 +109,22 @@ export class AuthService {
       });
       throw new ConflictException('Email already exists');
     }
+
     const hashedPassword = await this.hashPassword(registrationData.password);
+
+    if (icon) {
+      const iconUrl = await this.firebaseStorageService.uploadFile(icon);
+      const userSecureData: RegistrationUserDto = {
+        ...registrationData,
+        password: hashedPassword,
+        iconLink: iconUrl,
+      };
+      const createdUser = await this.usersService.create(userSecureData);
+      const tokens = await this.tokensService.generateTokens(createdUser);
+      this.tokensService.saveRefreshToken(tokens.refreshToken, createdUser.id);
+      return tokens;
+    }
+
     const userSecureData: RegistrationUserDto = {
       ...registrationData,
       password: hashedPassword,
@@ -125,6 +143,16 @@ export class AuthService {
     const user = await this.usersService.getOneByCriteria({
       where: { id: userId },
     });
+
+    if (!user) {
+      this.logger.log({
+        message: `User with id ${userId} is not found`,
+        level: 'error',
+        context: 'AuthService.refresh',
+      });
+      throw new NotFoundException('User is not found');
+    }
+
     const tokens = await this.tokensService.generateTokens(user);
     return { accessToken: tokens.accessToken };
   }

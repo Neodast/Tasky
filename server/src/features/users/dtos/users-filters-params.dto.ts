@@ -1,7 +1,7 @@
+import { UserRoles } from './../../../common/enums/user-roles.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 import { PaginationParamsDto } from 'src/common/dtos/pagination-params.dto';
-import { UserRoles } from 'src/common/enums/user-role.enum';
 
 export class UsersFiltersParamsDto extends PaginationParamsDto {
   @ApiProperty({

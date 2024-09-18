@@ -34,5 +34,5 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsString()
-  imageLink?: string;
+  iconLink?: string;
 }

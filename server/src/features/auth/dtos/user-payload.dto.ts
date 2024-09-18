@@ -1,6 +1,6 @@
+import { UserRoles } from './../../../common/enums/user-roles.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { UserRoles } from 'src/common/enums/user-role.enum';
 
 export class UserPayloadDto {
   @ApiProperty({

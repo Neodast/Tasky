@@ -7,17 +7,19 @@ import { AuthService } from './auth.service';
 import { CookieHelper } from './helpers/cookie.helper';
 import { LocalStrategy } from './strategies/local.strategy';
 import { TokenModule } from './tokens/token.module';
-import { Token } from './tokens/token.entity';
+import { TokenEntity } from './tokens/token.entity';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { AuthMapper } from './mappers/auth.mapper';
 import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
+import { FirebaseModule } from 'src/firebase/firebase.module';
 //TODO i want to create auth service in 4001 port
 @Module({
   imports: [
-    TokenModule,
-    TypeOrmModule.forFeature([Token]),
-    UsersModule,
+    TypeOrmModule.forFeature([TokenEntity]),
     JwtModule.register({}),
+    TokenModule,
+    UsersModule,
+    FirebaseModule,
   ],
   controllers: [AuthController],
   providers: [

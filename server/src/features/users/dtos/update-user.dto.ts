@@ -1,3 +1,4 @@
+import { UserRoles } from './../../../common/enums/user-roles.enum';
 import {
   IsEmail,
   IsEnum,
@@ -7,7 +8,6 @@ import {
   IsString,
   IsUUID,
 } from 'class-validator';
-import { UserRoles } from 'src/common/enums/user-role.enum';
 
 export class UpdateUserDto {
   @IsUUID(4)

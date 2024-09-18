@@ -10,7 +10,7 @@ import { plainToInstance } from 'class-transformer';
 import { ClassConstructor } from 'class-transformer/types/interfaces';
 
 @Injectable()
-export class SerializeInterceptor<T> implements NestInterceptor {
+export class SerializeOutputInterceptor<T> implements NestInterceptor {
   constructor(private readonly dto: ClassConstructor<T>) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {

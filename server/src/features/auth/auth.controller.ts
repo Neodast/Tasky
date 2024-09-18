@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Inject,
   Post,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -24,6 +25,7 @@ import { UserPayloadDto } from './dtos/user-payload.dto';
 import { JwtAccessClearCookieInterceptor } from './interceptors/jwt-access-clear-cookie.interceptor';
 import { JwtAccessAuthGuard } from './guards/jwt-access-auth.guard';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -73,10 +75,15 @@ export class AuthController {
     status: HttpStatus.CREATED,
   })
   @PublicAccess()
+  @UseInterceptors(FileInterceptor('icon'))
   public async registration(
     @Body() registrationData: RegistrationUserDto,
+    @UploadedFile() icon?: Express.Multer.File,
   ): Promise<AccessToken> {
-    const accessToken = await this.authService.registration(registrationData);
+    const accessToken = await this.authService.registration(
+      registrationData,
+      icon,
+    );
     this.logger.log({
       message: `User ${registrationData.username} successfully register`,
       level: 'info',

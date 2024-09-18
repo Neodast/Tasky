@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Token } from './token.entity';
+import { TokenEntity } from './token.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { AccessToken } from 'src/features/auth/types/access-token.type';
@@ -16,7 +16,7 @@ export class TokensService {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
-    @InjectRepository(Token) private repository: Repository<Token>,
+    @InjectRepository(TokenEntity) private repository: Repository<TokenEntity>,
     @Inject(WINSTON_MODULE_NEST_PROVIDER) private logger: Logger,
   ) {}
 
@@ -50,7 +50,7 @@ export class TokensService {
   public async saveRefreshToken(
     refreshToken: string,
     userId: string,
-  ): Promise<Token> {
+  ): Promise<TokenEntity> {
     return this.repository.save(
       this.repository.create({
         refreshToken: refreshToken,
@@ -70,16 +70,24 @@ export class TokensService {
 
   public async deleteRefreshToken(refreshToken: string): Promise<void> {
     const token = await this.getRefreshByRefreshToken(refreshToken);
+    if (!token) {
+      this.logger.log({
+        message: `Tokens ${token} is not found`,
+        level: 'error',
+        context: 'TokensService.generateTokens',
+      });
+      throw new NotFoundException('Token is not found');
+    }
     this.repository.remove(token);
   }
 
-  public async getRefreshByUserId(id: string): Promise<Token | null> {
+  public async getRefreshByUserId(id: string): Promise<TokenEntity | null> {
     return this.repository.findOne({ where: { user: { id: id } } });
   }
 
   public async getRefreshByRefreshToken(
     refreshToken: string,
-  ): Promise<Token | null> {
+  ): Promise<TokenEntity | null> {
     return this.repository.findOne({
       where: { refreshToken: refreshToken },
     });
