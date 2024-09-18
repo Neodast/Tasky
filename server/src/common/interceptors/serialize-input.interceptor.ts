@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 export class SerializeInputInterceptor<T> implements NestInterceptor {
   constructor(private readonly dto: ClassConstructor<T>) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<T> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
 
     if (request.body)

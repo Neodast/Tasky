@@ -6,6 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
+import { FirebaseAppError } from 'firebase-admin/app';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -19,12 +20,16 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const httpStatus =
       exception instanceof HttpException
         ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+        : exception instanceof FirebaseAppError
+          ? Number(exception.code)
+          : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const message =
       exception instanceof HttpException
         ? exception.message
-        : 'Internal server error';
+        : exception instanceof FirebaseAppError
+          ? exception.message
+          : exception;
 
     const responseBody = {
       statusCode: httpStatus,

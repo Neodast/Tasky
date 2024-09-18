@@ -37,5 +37,5 @@ export class RegistrationUserDto {
 
   @IsOptional()
   @IsString()
-  imageLink?: string;
+  iconLink?: string;
 }

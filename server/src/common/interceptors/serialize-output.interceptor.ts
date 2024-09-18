@@ -13,7 +13,7 @@ import { ClassConstructor } from 'class-transformer/types/interfaces';
 export class SerializeOutputInterceptor<T> implements NestInterceptor {
   constructor(private readonly dto: ClassConstructor<T>) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<T> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data: T) => {
         return plainToInstance(this.dto, data, {
