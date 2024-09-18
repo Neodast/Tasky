@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="w17YPuQ0771CgUVqMDSf" name="FRONTEND">
-        <mxGraphModel dx="2118" dy="715" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2139" dy="715" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -436,7 +436,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="hX5KFoz4p9EsU0SpwPxo" name="BACKEND">
-        <mxGraphModel dx="2571" dy="1353" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2489" dy="1115" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -580,9 +580,6 @@
                 <mxCell id="uRf0da8du9FiXmU6UArm-2" value="&lt;font color=&quot;#f02424&quot; size=&quot;1&quot; style=&quot;&quot;&gt;&lt;b style=&quot;font-size: 25px;&quot;&gt;Feature&lt;/b&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=3;" parent="1" vertex="1">
                     <mxGeometry x="-870" y="530" width="130" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="g58aoYQoKY0OYxEriIco-5" value="Maybe in future i will create independent Auth and Notification Services in another folders and with another servers using microservice arch. tools.&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=21;" parent="1" vertex="1">
-                    <mxGeometry x="-40" y="320" width="290" height="180" as="geometry"/>
-                </mxCell>
                 <mxCell id="oXJNa7XXHSDK6ZSJ_mql-1" value="Notification&lt;br&gt;module" style="rounded=0;whiteSpace=wrap;html=1;fontSize=20;horizontal=1;strokeWidth=3;" parent="1" vertex="1">
                     <mxGeometry x="130" y="130" width="120" height="80" as="geometry"/>
                 </mxCell>
@@ -602,7 +599,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="kR9nTN7Y2uYUobXD67or" name="DB">
-        <mxGraphModel dx="1428" dy="715" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1891" dy="715" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>

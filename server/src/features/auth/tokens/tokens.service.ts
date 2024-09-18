@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TokenEntity } from './token.entity';
 import { Repository, UpdateResult } from 'typeorm';
@@ -70,6 +70,14 @@ export class TokensService {
 
   public async deleteRefreshToken(refreshToken: string): Promise<void> {
     const token = await this.getRefreshByRefreshToken(refreshToken);
+    if (!token) {
+      this.logger.log({
+        message: `Tokens ${token} is not found`,
+        level: 'error',
+        context: 'TokensService.generateTokens',
+      });
+      throw new NotFoundException('Token is not found');
+    }
     this.repository.remove(token);
   }
 

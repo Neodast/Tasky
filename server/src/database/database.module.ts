@@ -17,7 +17,7 @@ import { Logger } from 'winston';
           username: configService.get<string>('database.user'),
           password: configService.get<string>('database.password'),
           database: configService.get<string>('database.name'),
-          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+          entities: [],
           synchronize:
             configService.get<string>('node.env') !== 'production'
               ? true

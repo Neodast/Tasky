@@ -135,6 +135,16 @@ export class UsersService {
       where: options.where,
       relations: [],
     });
+
+    if (!user) {
+      this.logger.log({
+        message: `User is not found`,
+        level: 'error',
+        context: 'UsersService.findByCriteria',
+      });
+      throw new NotFoundException('User is not found');
+    }
+
     this.logger.log({
       message: `User ${user.username} successfully gotten from database`,
       level: 'info',

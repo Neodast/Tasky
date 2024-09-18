@@ -125,6 +125,16 @@ export class AuthService {
     const user = await this.usersService.getOneByCriteria({
       where: { id: userId },
     });
+
+    if (!user) {
+      this.logger.log({
+        message: `User with id ${userId} is not found`,
+        level: 'error',
+        context: 'AuthService.refresh',
+      });
+      throw new NotFoundException('User is not found');
+    }
+
     const tokens = await this.tokensService.generateTokens(user);
     return { accessToken: tokens.accessToken };
   }
