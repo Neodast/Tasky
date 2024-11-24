@@ -12,7 +12,7 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { AuthMapper } from './mappers/auth.mapper';
 import { JwtAccessStrategy } from './strategies/jwt-access.strategy';
 import { FirebaseModule } from 'src/firebase/firebase.module';
-//TODO i want to create auth service in 4001 port
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([TokenEntity]),

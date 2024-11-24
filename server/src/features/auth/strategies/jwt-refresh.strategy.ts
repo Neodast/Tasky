@@ -5,6 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 import { UserPayloadDto } from '../dtos/user-payload.dto';
 import { AuthJwtPayloadDto } from '../dtos/auth-jwt-payload.dto';
+import { RefreshCookieExtractor } from '../extractors/cookie.extractor';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -16,7 +17,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
     private authService: AuthService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([RefreshCookieExtractor]),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('jwt.refresh.secret'),
     });
@@ -24,7 +25,6 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
   public async validate(payload: AuthJwtPayloadDto): Promise<UserPayloadDto> {
     const user: UserPayloadDto = payload.sub;
-    console.log(user);
     return user;
   }
 }

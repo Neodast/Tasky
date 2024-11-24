@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegistrationUserDto } from './dtos/register-user.dto';
-import { JwtAccessSetCookieInterceptor } from './interceptors/jwt-access-set-cookie.interceptor';
+import { JwtRefreshSetCookieInterceptor } from './interceptors/jwt-refresh-set-cookie.interceptor';
 import { LoginUserDto } from './dtos/login-user.dto';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AccessToken } from 'src/features/auth/types/access-token.type';
@@ -22,7 +22,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { UserPayloadDto } from './dtos/user-payload.dto';
-import { JwtAccessClearCookieInterceptor } from './interceptors/jwt-access-clear-cookie.interceptor';
+import { JwtRefreshClearCookieInterceptor } from './interceptors/jwt-refresh-clear-cookie.interceptor';
 import { JwtAccessAuthGuard } from './guards/jwt-access-auth.guard';
 import { ApiBearerAuth, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -42,7 +42,7 @@ export class AuthController {
     status: HttpStatus.OK,
   })
   @PublicAccess()
-  @UseInterceptors(JwtAccessSetCookieInterceptor)
+  @UseInterceptors(JwtRefreshSetCookieInterceptor)
   @UseGuards(LocalAuthGuard)
   public async login(
     @Body() loginData: LoginUserDto,
@@ -57,7 +57,7 @@ export class AuthController {
   }
 
   @Get('logout')
-  @UseInterceptors(JwtAccessClearCookieInterceptor)
+  @UseInterceptors(JwtRefreshClearCookieInterceptor)
   @UseGuards(JwtAccessAuthGuard)
   public async logout(@CurrentUser() user: UserPayloadDto): Promise<void> {
     this.authService.logout(user.id);
@@ -98,7 +98,6 @@ export class AuthController {
     example: 'accessToken: {access}',
     status: HttpStatus.OK,
   })
-  @UseInterceptors(JwtAccessSetCookieInterceptor)
   @UseGuards(JwtRefreshAuthGuard)
   public async refresh(
     @CurrentUser() user: UserPayloadDto,

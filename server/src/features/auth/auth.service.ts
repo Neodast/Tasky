@@ -120,7 +120,9 @@ export class AuthService {
         iconLink: iconUrl,
       };
       const createdUser = await this.usersService.create(userSecureData);
-      const tokens = await this.tokensService.generateTokens(createdUser);
+      const tokens = await this.tokensService.generateTokens(
+        this.authMapper.mapUserToUserPayloadDto(createdUser),
+      );
       this.tokensService.saveRefreshToken(tokens.refreshToken, createdUser.id);
       return tokens;
     }
@@ -153,7 +155,9 @@ export class AuthService {
       throw new NotFoundException('User is not found');
     }
 
-    const tokens = await this.tokensService.generateTokens(user);
+    const tokens = await this.tokensService.generateTokens(
+      this.authMapper.mapUserToUserPayloadDto(user),
+    );
     return { accessToken: tokens.accessToken };
   }
 }
