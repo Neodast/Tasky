@@ -9,14 +9,14 @@ import { map } from 'rxjs/operators';
 import { CookieHelper } from '../helpers/cookie.helper';
 
 @Injectable()
-export class JwtAccessClearCookieInterceptor implements NestInterceptor {
+export class JwtRefreshClearCookieInterceptor implements NestInterceptor {
   constructor(private cookieHelper: CookieHelper) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map(() => {
         const res = context.switchToHttp().getResponse();
 
-        this.cookieHelper.clearCookie(res, 'accessToken');
+        this.cookieHelper.clearCookie(res, 'refreshToken');
       }),
     );
   }

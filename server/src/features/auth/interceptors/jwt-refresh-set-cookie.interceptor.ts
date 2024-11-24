@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 import { CookieHelper } from '../helpers/cookie.helper';
 
 @Injectable()
-export class JwtAccessSetCookieInterceptor implements NestInterceptor {
+export class JwtRefreshSetCookieInterceptor implements NestInterceptor {
   constructor(private cookieHelper: CookieHelper) {}
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
@@ -17,7 +17,7 @@ export class JwtAccessSetCookieInterceptor implements NestInterceptor {
         const res = context.switchToHttp().getResponse();
         const { accessToken, refreshToken } = data;
 
-        this.cookieHelper.setCookie(res, 'accessToken', accessToken);
+        this.cookieHelper.setCookie(res, 'refreshToken', refreshToken);
 
         return { accessToken: accessToken, refreshToken: refreshToken };
       }),
